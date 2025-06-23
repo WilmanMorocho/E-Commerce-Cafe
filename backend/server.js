@@ -29,7 +29,7 @@ app.get('/api/products/test', (req, res) => {
   res.json({ message: 'API de productos funcionando correctamente' });
 });
 
-app.use('/api/products', require('./routes/products'));
+app.use('/api/products', require('./routes/productsRoutes'));
 app.use('/api/users', require('./routes/users'));
 
 app.listen(PORT, () => {

@@ -22,8 +22,7 @@ const userSchema = mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Por favor ingresa la contraseña'],
-    minlength: [6, 'La contraseña debe tener al menos 6 caracteres']
+    required: [true, 'Por favor ingresa la contraseña']
   },
   role: {
     type: String,
@@ -32,17 +31,6 @@ const userSchema = mongoose.Schema({
   }
 }, {
   timestamps: true
-});
-
-// Logging para debug
-userSchema.pre('save', function(next) {
-  console.log('=== GUARDANDO USUARIO ===');
-  console.log('Datos:', this.toObject());
-  next();
-});
-
-userSchema.post('save', function(doc) {
-  console.log('Usuario guardado exitosamente:', doc._id);
 });
 
 module.exports = mongoose.model('User', userSchema);
