@@ -1,10 +1,11 @@
 // backend/controllers/userController.js
-const User = require('../models/User');
+const User = require('../models/user');
+const { Op } = require('sequelize');
 
 // Registro de usuario
 const registerUser = async (req, res) => {
   try {
-    console.log('=== REGISTRANDO USUARIO ===');
+    console.log('=== REGISTRANDO USUARIO (PostgreSQL) ===');
     console.log('Datos recibidos:', req.body);
     
     const { fullname, email, username, password, role } = req.body;
@@ -19,7 +20,7 @@ const registerUser = async (req, res) => {
     // Verificar si el usuario ya existe
     const existingUser = await User.findOne({
       where: {
-        [User.sequelize.Sequelize.Op.or]: [
+        [Op.or]: [
           { email },
           { username }
         ]
@@ -36,7 +37,7 @@ const registerUser = async (req, res) => {
       fullname: fullname.trim(),
       email: email.trim().toLowerCase(),
       username: username.trim(),
-      password: password, // En producción, hashear la contraseña
+      password: password,
       role: role || 'cliente'
     });
     
@@ -60,7 +61,7 @@ const registerUser = async (req, res) => {
 // Login de usuario
 const loginUser = async (req, res) => {
   try {
-    console.log('=== LOGIN USUARIO ===');
+    console.log('=== LOGIN USUARIO (PostgreSQL) ===');
     const { username, password } = req.body;
     
     if (!username || !password) {
@@ -104,15 +105,15 @@ const getUsers = async (req, res) => {
 // Eliminar usuario
 const deleteUser = async (req, res) => {
   try {
-    const user = await User.destroy({
+    const deleted = await User.destroy({
       where: { username: req.params.username }
     });
     
-    if (!user) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+    if (deleted) {
+      res.json({ message: 'Usuario eliminado exitosamente' });
+    } else {
+      res.status(404).json({ message: 'Usuario no encontrado' });
     }
-    
-    res.json({ message: 'Usuario eliminado exitosamente' });
   } catch (error) {
     console.error('Error en deleteUser:', error);
     res.status(500).json({ message: error.message });

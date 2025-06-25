@@ -1,4 +1,4 @@
-// backend/models/Product.js
+// backend/models/Product.js (renombrar el archivo)
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
 

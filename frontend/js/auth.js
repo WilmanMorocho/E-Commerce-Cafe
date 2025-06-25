@@ -1,4 +1,29 @@
 // frontend/js/auth.js - Actualizar las funciones de registro y login
+
+// Función para cerrar sesión (usar en todos los archivos)
+function logout() {
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem('userRole');
+  localStorage.removeItem('username');
+  localStorage.removeItem('cart'); // Limpiar carrito también
+  window.location.href = 'home.html';
+}
+
+// Configurar botones de logout en todas las páginas
+document.addEventListener('DOMContentLoaded', function() {
+  // Configurar logout para todos los botones
+  const logoutBtns = document.querySelectorAll('#logout-btn, #nav-logout');
+  logoutBtns.forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        logout();
+      });
+    }
+  });
+});
+
+// Register form
 const registerForm = document.getElementById('register-form');
 if (registerForm) {
   registerForm.addEventListener('submit', async function(e) {
@@ -14,7 +39,7 @@ if (registerForm) {
     
     try {
       console.log('Enviando datos de registro:', userData);
-      const user = await fetch('/api/users/register', {
+      const response = await fetch('/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -22,23 +47,21 @@ if (registerForm) {
         body: JSON.stringify(userData)
       });
       
-      if (!user.ok) {
-        const error = await user.json();
-        throw new Error(error.message);
+      if (response.ok) {
+        const userData_response = await response.json();
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userRole', userData_response.role);
+        localStorage.setItem('username', userData_response.username);
+        
+        alert('¡Registro exitoso!');
+        window.location.href = 'cliente.html';
+      } else {
+        const error = await response.json();
+        document.getElementById('error-message').textContent = error.message;
       }
-      
-      const userData_response = await user.json();
-      
-      // Guardar en localStorage y redirigir
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userRole', userData_response.role);
-      localStorage.setItem('username', userData_response.username);
-      
-      alert('¡Registro exitoso!');
-      window.location.href = 'cliente.html';
     } catch (error) {
       console.error('Error en registro:', error);
-      document.getElementById('error-message').textContent = error.message;
+      document.getElementById('error-message').textContent = 'Error de conexión. Intenta nuevamente.';
     }
   });
 }
@@ -53,7 +76,7 @@ if (loginForm) {
     const password = document.getElementById('password').value;
     const errorMessage = document.getElementById('error-message');
     
-    // Verificación de usuarios hardcodeados primero
+    // Verificación de admin hardcodeado
     if (username === 'admin' && password === 'admin') {
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('userRole', 'admin');

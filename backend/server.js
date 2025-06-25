@@ -29,5 +29,5 @@ app.use('/api/products', require('./routes/products')); // Corregir nombre
 app.use('/api/users', require('./routes/users'));
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

@@ -107,7 +107,9 @@ async function saveProduct(e) {
             name: nameInput.value.trim(),
             description: descriptionInput.value.trim(),
             price: parseFloat(priceInput.value),
-            stock: parseInt(stockInput.value)
+            stock: parseInt(stockInput.value),
+            category: document.getElementById('category').value,
+            image: document.getElementById('image').value || 'assets/default-coffee.jpg'
         };
         
         console.log('Datos del producto a enviar:', product);

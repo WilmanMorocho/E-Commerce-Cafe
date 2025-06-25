@@ -17,11 +17,11 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 
 // @route   GET /api/users
-// @desc    Obtener todos los usuarios (solo admin)
+// @desc    Obtener todos los usuarios
 router.get('/', getUsers);
 
 // @route   DELETE /api/users/:username
-// @desc    Eliminar usuario por username
+// @desc    Eliminar usuario
 router.delete('/:username', deleteUser);
 
 module.exports = router;

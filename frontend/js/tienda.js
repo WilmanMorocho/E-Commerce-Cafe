@@ -30,59 +30,36 @@ document.addEventListener('DOMContentLoaded', function() {
     let products = [];
     let selectedProduct = null;
     
-    // Función para cargar los productos
+    // ✅ SOLO cargar desde API - ELIMINAR localStorage
     async function loadProducts() {
         try {
-            // Primero intentamos obtener productos de la API
+            console.log('Cargando productos desde API...');
             const response = await fetch('/api/products');
             
             if (response.ok) {
                 products = await response.json();
+                console.log('Productos cargados desde API:', products.length);
+                displayProducts(products);
             } else {
-                // Como respaldo, usamos localStorage
-                products = JSON.parse(localStorage.getItem('products') || '[]');
-                
-                // Si no hay productos, mostramos productos de ejemplo
-                if (products.length === 0) {
-                    console.log('No se encontraron productos, mostrando productos de muestra');
-                    products = getSampleProducts();
-                }
+                console.error('Error al cargar productos:', response.status);
+                // ✅ NO usar localStorage como respaldo
+                products = [];
+                displayProducts(products);
             }
-            
-            // Mostrar los productos
-            displayProducts(products);
         } catch (error) {
             console.error('Error al cargar productos:', error);
-            
-            // Intentar recuperar desde localStorage
-            products = JSON.parse(localStorage.getItem('products') || '[]');
-            
-            if (products.length === 0) {
-                products = getSampleProducts();
-            }
-            
+            // ✅ NO usar localStorage como respaldo
+            products = [];
             displayProducts(products);
         }
     }
-    
-    // Cargar productos al iniciar
+
     loadProducts();
-    
-    // Función para generar productos de muestra (solo como respaldo)
-    function getSampleProducts() {
-        return [
-            { id: 1, name: 'Espresso Intenso', price: 12.99, category: 'espresso', description: 'Café espresso intenso con notas a chocolate y caramelo.', image: 'assets/espresso.jpg' },
-            { id: 2, name: 'Blend Suave', price: 9.99, category: 'blend', description: 'Mezcla equilibrada con notas frutales y baja acidez.', image: 'assets/blend.jpg' },
-            { id: 3, name: 'Arábica Premium', price: 15.99, category: 'arabica', description: 'Granos de arábica de altura con notas florales.', image: 'assets/arabica.jpg' },
-            { id: 4, name: 'Espresso Gourmet', price: 18.50, category: 'espresso', description: 'Espresso premium con intenso sabor y aroma.', image: 'assets/espresso-gourmet.jpg' },
-            { id: 5, name: 'Café de Especialidad', price: 24.99, category: 'specialty', description: 'Café de especialidad con notas a bayas silvestres.', image: 'assets/specialty.jpg' },
-            { id: 6, name: 'Blend Oscuro', price: 11.50, category: 'blend', description: 'Mezcla de tueste oscuro con notas a chocolate amargo.', image: 'assets/dark-blend.jpg' }
-        ];
-    }
-    
-    // Carrito de compras
+
+    // Carrito de compras - mantener solo en memoria durante la sesión
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     updateCartCount();
+    
     
     // Evento para filtros de precio
     document.getElementById('apply-filters').addEventListener('click', function() {
@@ -223,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h3>${product.name}</h3>
                     <p>${product.description}</p>
                     <div class="product-price">$${product.price.toFixed(2)}</div>
-                    <button class="add-to-cart-btn" data-id="${product._id || product.id}">Añadir al Carrito</button>
+                    <button class="add-to-cart-btn" data-id="${product.id}">Añadir al Carrito</button>
                 </div>
             </div>
         `).join('');

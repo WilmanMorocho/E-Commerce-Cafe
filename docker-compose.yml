@@ -8,7 +8,7 @@ services:
     networks:
       - app-network
     deploy:
-      replicas: 3
+      replicas: 1  # Cambiar de 3 a 1 para debug
       restart_policy:
         condition: on-failure
 
@@ -19,34 +19,18 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=5000
-      - POSTGRES_HOST=cafe-aroma_database
+      - POSTGRES_HOST=database  # ✅ Cambiar de 'cafe-aroma_database' a 'database'
       - POSTGRES_DB=cafeAroma
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password123
     networks:
       - app-network
     depends_on:
-      - postgres
+      - database  # ✅ Cambiar de 'postgres' a 'database'
     deploy:
-      replicas: 2
+      replicas: 1  # Cambiar de 2 a 1 para debug
       restart_policy:
         condition: on-failure
-
-  # mongodb:
-  #   image: mongo:4.4-focal
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - mongo-data:/data/db
-  #   networks:
-  #     - app-network
-  #   deploy:
-  #     replicas: 1
-  #     restart_policy:
-  #       condition: on-failure
-  #     placement:
-  #       constraints:
-  #         - node.role == manager
 
   database:
     image: postgres:13-alpine
@@ -74,6 +58,5 @@ networks:
     attachable: true
 
 volumes:
-  mongo-data:
-    driver: local
   postgres_data:
+    driver: local
