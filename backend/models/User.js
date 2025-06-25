@@ -1,47 +1,57 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const userSchema = mongoose.Schema({
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   fullname: {
-    type: String,
-    required: [true, "Por favor ingresa el nombre completo"],
-    trim: true
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: { msg: 'Por favor ingresa el nombre completo' }
+    }
   },
   email: {
-    type: String,
-    required: [true, "Por favor ingresa el email"],
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true,
-    trim: true,
-    lowercase: true
+    validate: {
+      isEmail: { msg: 'Por favor ingresa un email válido' }
+    }
   },
   username: {
-    type: String,
-    required: [true, "Por favor ingresa el nombre de usuario"],
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true,
-    trim: true
+    validate: {
+      notEmpty: { msg: 'Por favor ingresa el nombre de usuario' }
+    }
   },
   password: {
-    type: String,
-    required: [true, "Por favor ingresa la contraseña"],
-    minlength: [6, "La contraseña debe tener al menos 6 caracteres"]
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      len: { args: [6, 100], msg: 'La contraseña debe tener al menos 6 caracteres' }
+    }
   },
   role: {
-    type: String,
-    enum: ["cliente", "admin"],
-    default: "cliente"
+    type: DataTypes.ENUM('cliente', 'admin'),
+    defaultValue: 'cliente'
   },
   address: {
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String,
-    country: String
+    type: DataTypes.JSONB, // PostgreSQL JSON field
+    defaultValue: {}
   },
   phone: {
-    type: String,
-    trim: true
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  tableName: 'users'
 });
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = User;

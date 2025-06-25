@@ -6,9 +6,6 @@ const connectDB = require('./config/db');
 // Cargar variables de entorno
 dotenv.config();
 
-// Conectar a la base de datos
-connectDB();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -20,18 +17,17 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Ruta de prueba
+// Conectar a la base de datos
+connectDB();
+
+// Rutas
 app.get('/api', (req, res) => {
-  res.json({ message: 'API funcionando correctamente' });
+  res.json({ message: 'API funcionando correctamente con PostgreSQL' });
 });
 
-app.get('/api/products/test', (req, res) => {
-  res.json({ message: 'API de productos funcionando correctamente' });
-});
-
-app.use('/api/products', require('./routes/productsRoutes'));
+app.use('/api/products', require('./routes/products')); // Corregir nombre
 app.use('/api/users', require('./routes/users'));
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
+  console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
 });

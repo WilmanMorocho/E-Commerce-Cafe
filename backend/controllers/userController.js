@@ -1,5 +1,5 @@
 // backend/controllers/userController.js
-const User = require('../models/User'); // Asegúrate de que sea 'User' con mayúscula
+const User = require('../models/User');
 
 // Registro de usuario
 const registerUser = async (req, res) => {
@@ -9,7 +9,6 @@ const registerUser = async (req, res) => {
     
     const { fullname, email, username, password, role } = req.body;
     
-    // Validación
     if (!fullname || !email || !username || !password) {
       return res.status(400).json({ 
         message: 'Todos los campos son requeridos',
@@ -18,8 +17,13 @@ const registerUser = async (req, res) => {
     }
     
     // Verificar si el usuario ya existe
-    const existingUser = await User.findOne({ 
-      $or: [{ email }, { username }] 
+    const existingUser = await User.findOne({
+      where: {
+        [User.sequelize.Sequelize.Op.or]: [
+          { email },
+          { username }
+        ]
+      }
     });
     
     if (existingUser) {
@@ -28,21 +32,18 @@ const registerUser = async (req, res) => {
       });
     }
     
-    const userData = {
+    const user = await User.create({
       fullname: fullname.trim(),
       email: email.trim().toLowerCase(),
       username: username.trim(),
       password: password, // En producción, hashear la contraseña
       role: role || 'cliente'
-    };
+    });
     
-    console.log('Datos procesados:', userData);
-    
-    const user = await User.create(userData);
-    console.log('Usuario creado con éxito:', user);
+    console.log('Usuario creado con éxito:', user.toJSON());
     
     res.status(201).json({
-      _id: user._id,
+      id: user.id,
       fullname: user.fullname,
       email: user.email,
       username: user.username,
@@ -51,8 +52,7 @@ const registerUser = async (req, res) => {
   } catch (error) {
     console.error('Error completo:', error);
     res.status(400).json({ 
-      message: error.message,
-      stack: error.stack 
+      message: error.message
     });
   }
 };
@@ -61,8 +61,6 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     console.log('=== LOGIN USUARIO ===');
-    console.log('Datos recibidos:', req.body);
-    
     const { username, password } = req.body;
     
     if (!username || !password) {
@@ -71,12 +69,11 @@ const loginUser = async (req, res) => {
       });
     }
     
-    const user = await User.findOne({ username });
-    console.log('Usuario encontrado:', user ? 'Sí' : 'No');
+    const user = await User.findOne({ where: { username } });
     
-    if (user && user.password === password) { // En producción, comparar hash
+    if (user && user.password === password) {
       res.json({
-        _id: user._id,
+        id: user.id,
         fullname: user.fullname,
         email: user.email,
         username: user.username,
@@ -94,9 +91,9 @@ const loginUser = async (req, res) => {
 // Obtener todos los usuarios
 const getUsers = async (req, res) => {
   try {
-    console.log('=== OBTENIENDO USUARIOS ===');
-    const users = await User.find().select('-password');
-    console.log(`Usuarios encontrados: ${users.length}`);
+    const users = await User.findAll({
+      attributes: { exclude: ['password'] }
+    });
     res.json(users);
   } catch (error) {
     console.error('Error en getUsers:', error);
@@ -107,14 +104,14 @@ const getUsers = async (req, res) => {
 // Eliminar usuario
 const deleteUser = async (req, res) => {
   try {
-    console.log(`=== ELIMINANDO USUARIO: ${req.params.username} ===`);
-    const user = await User.findOneAndDelete({ username: req.params.username });
+    const user = await User.destroy({
+      where: { username: req.params.username }
+    });
     
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
     
-    console.log('Usuario eliminado exitosamente');
     res.json({ message: 'Usuario eliminado exitosamente' });
   } catch (error) {
     console.error('Error en deleteUser:', error);

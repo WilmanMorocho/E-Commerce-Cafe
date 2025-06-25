@@ -1,48 +1,53 @@
-// backend/models/products.js
-const mongoose = require('mongoose');
+// backend/models/Product.js
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const productSchema = mongoose.Schema({
+const Product = sequelize.define('Product', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   name: {
-    type: String,
-    required: [true, 'Por favor ingresa el nombre del producto'],
-    trim: true
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: { msg: 'Por favor ingresa el nombre del producto' }
+    }
   },
   description: {
-    type: String,
-    required: [true, 'Por favor ingresa una descripción'],
-    trim: true
+    type: DataTypes.TEXT,
+    allowNull: false,
+    validate: {
+      notEmpty: { msg: 'Por favor ingresa una descripción' }
+    }
   },
   price: {
-    type: Number,
-    required: [true, 'Por favor ingresa el precio'],
-    min: [0, 'El precio debe ser positivo']
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    validate: {
+      min: { args: [0], msg: 'El precio debe ser positivo' }
+    }
   },
   stock: {
-    type: Number,
-    required: [true, 'Por favor ingresa la cantidad en stock'],
-    default: 0,
-    min: [0, 'El stock no puede ser negativo']
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+    validate: {
+      min: { args: [0], msg: 'El stock no puede ser negativo' }
+    }
   },
   category: {
-    type: String,
-    default: 'coffee'
+    type: DataTypes.STRING,
+    defaultValue: 'coffee'
   },
   image: {
-    type: String,
-    default: 'assets/default-coffee.jpg'
+    type: DataTypes.STRING,
+    defaultValue: 'assets/default-coffee.jpg'
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  tableName: 'products'
 });
 
-// Agregar logging para debug
-productSchema.pre('save', function(next) {
-  console.log('Guardando producto:', this.toObject());
-  next();
-});
-
-productSchema.post('save', function(doc) {
-  console.log('Producto guardado exitosamente:', doc._id);
-});
-
-module.exports = mongoose.model('Product', productSchema);
+module.exports = Product;
