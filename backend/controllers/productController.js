@@ -1,10 +1,9 @@
-const Product = require('../models/products'); // Cambiar la importación
+const Product = require('../models/products');
 
-// Obtener todos los productos
 const getProducts = async (req, res) => {
   try {
     console.log('=== OBTENIENDO PRODUCTOS (PostgreSQL) ===');
-    const products = await Product.findAll(); // Cambiar de .find() a .findAll()
+    const products = await Product.findAll();
     console.log(`Productos encontrados: ${products.length}`);
     res.status(200).json(products);
   } catch (error) {
@@ -13,7 +12,6 @@ const getProducts = async (req, res) => {
   }
 };
 
-// Crear un nuevo producto
 const createProduct = async (req, res) => {
   try {
     console.log('=== CREANDO PRODUCTO (PostgreSQL) ===');
@@ -47,7 +45,6 @@ const createProduct = async (req, res) => {
   }
 };
 
-// Obtener un producto por ID
 const getProduct = async (req, res) => {
   try {
     console.log(`Solicitando producto con ID: ${req.params.id}`);
@@ -63,7 +60,6 @@ const getProduct = async (req, res) => {
   }
 };
 
-// Actualizar un producto
 const updateProduct = async (req, res) => {
   try {
     console.log(`Actualizando producto con ID: ${req.params.id}`, req.body);
@@ -86,7 +82,6 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// Eliminar un producto
 const deleteProduct = async (req, res) => {
   try {
     console.log(`Eliminando producto con ID: ${req.params.id}`);

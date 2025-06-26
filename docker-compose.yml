@@ -8,7 +8,7 @@ services:
     networks:
       - app-network
     deploy:
-      replicas: 1  # Cambiar de 3 a 1 para debug
+      replicas: 3
       restart_policy:
         condition: on-failure
 
@@ -19,16 +19,18 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=5000
-      - POSTGRES_HOST=database  # ✅ Cambiar de 'cafe-aroma_database' a 'database'
+      - POSTGRES_HOST=database
       - POSTGRES_DB=cafeAroma
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password123
     networks:
-      - app-network
+      app-network:
+        aliases:
+          - backend
     depends_on:
-      - database  # ✅ Cambiar de 'postgres' a 'database'
+      - database
     deploy:
-      replicas: 1  # Cambiar de 2 a 1 para debug
+      replicas: 2
       restart_policy:
         condition: on-failure
 
@@ -52,11 +54,9 @@ services:
         constraints:
           - node.role == manager
 
+volumes:
+  postgres_data:
+
 networks:
   app-network:
     driver: overlay
-    attachable: true
-
-volumes:
-  postgres_data:
-    driver: local
